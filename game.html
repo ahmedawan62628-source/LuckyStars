@@ -2,69 +2,56 @@
 <html>
 <head>
     <title>Lucky Stars - Play Online</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background: #000; color: gold; font-family: 'Arial', sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .machine { background: linear-gradient(180deg, #333, #111); border: 5px solid #FFD700; border-radius: 20px; padding: 20px; max-width: 400px; margin: auto; box-shadow: 0 0 20px #FFD700; }
-        .reels { display: flex; justify-content: space-around; background: #fff; border-radius: 10px; padding: 10px; margin: 20px 0; height: 100px; align-items: center; }
-        .reel { font-size: 50px; }
-        .balance-box { background: #222; border: 1px solid #FFD700; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 20px; }
-        .spin-btn { background: linear-gradient(to bottom, #FFD700, #DAA520); border: none; padding: 20px 60px; font-size: 24px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 5px #999; width: 100%; }
-        .spin-btn:active { box-shadow: 0 2px #666; transform: translateY(4px); }
-        .win-msg { color: #00ff00; font-weight: bold; height: 30px; margin-top: 15px; }
-        @keyframes blur { from { filter: blur(0); } to { filter: blur(10px); } }
-        .spinning { animation: blur 0.1s infinite alternate; }
+        body { background: #000; color: #FFD700; font-family: 'Arial', sans-serif; text-align: center; }
+        .game-container { border: 5px solid #FFD700; border-radius: 20px; padding: 20px; width: 300px; margin: 50px auto; box-shadow: 0 0 20px #FFD700; }
+        .wallet { background: #222; padding: 10px; border-radius: 10px; margin-bottom: 20px; font-size: 1.5em; border: 1px solid #FFD700; }
+        .reels { display: flex; justify-content: center; gap: 10px; background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .reel { font-size: 3em; width: 60px; height: 60px; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 1px solid #ccc; }
+        .spin-btn { background: linear-gradient(#FFD700, #B8860B); border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.5em; font-weight: bold; cursor: pointer; color: #000; box-shadow: 0 5px #666; width: 100%; }
+        .spin-btn:active { transform: translateY(4px); box-shadow: 0 2px #444; }
     </style>
 </head>
 <body>
 
-    <h1>🌟 LUCKY STARS 🌟</h1>
-    
-    <div class="machine">
-        <div class="balance-box">WALLET: $<span id="balance">0.00</span></div>
-        
+    <h1 style="text-shadow: 0 0 10px #FFD700;">🌟 LUCKY STARS 🌟</h1>
+
+    <div class="game-container">
+        <div class="wallet">WALLET: $<span id="balance">10.00</span></div>
+
         <div class="reels">
-            <div id="r1" class="reel">💎</div>
-            <div id="r2" class="reel">7️⃣</div>
-            <div id="r3" class="reel">💎</div>
+            <div class="reel" id="r1">💎</div>
+            <div class="reel" id="r2">7</div>
+            <div class="reel" id="r3">💎</div>
         </div>
 
         <button class="spin-btn" onclick="spin()">SPIN</button>
-        <div id="status" class="win-msg"></div>
     </div>
 
-   <script>
-    let currentPlayer = prompt("Please enter your FB Username to login:");
-    let balance = 0;
+    <script>
+        let balance = parseFloat(document.getElementById('balance').innerText);
+        const symbols = ['💎', '7', '🍒', '🍋', '⭐'];
 
-    // This function "calls" the backend data
-    async function updateFromBackend() {
-        try {
-            const response = await fetch('game_data.json');
-            const data = await response.json();
-            const user = data.find(u => u.name === currentPlayer.toLowerCase());
-            if (user) {
-                balance = user.balance;
+        function spin() {
+            if (balance < 1.00) { alert("Add more credits via CashApp!"); return; }
+            
+            balance -= 1.00; // Cost per spin
+            document.getElementById('balance').innerText = balance.toFixed(2);
+
+            let r1 = symbols[Math.floor(Math.random() * symbols.length)];
+            let r2 = symbols[Math.floor(Math.random() * symbols.length)];
+            let r3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+            document.getElementById('r1').innerText = r1;
+            document.getElementById('r2').innerText = r2;
+            document.getElementById('r3').innerText = r3;
+
+            if (r1 === r2 && r2 === r3) {
+                alert("JACKPOT! You won $10!");
+                balance += 10.00;
                 document.getElementById('balance').innerText = balance.toFixed(2);
-            } else {
-                alert("User not found! Contact Admin on FB.");
             }
-        } catch (e) {
-            console.log("Waiting for Admin to sync...");
         }
-    }
-
-    // Initial Sync
-    updateFromBackend();
-    // Sync every 5 seconds
-    setInterval(updateFromBackend, 5000);
-
-    function spin() {
-        if (balance < 1) {
-            alert("Insufficient Credits!");
-            return;
-        }
-        // Slot machine visual logic... (Keep the spinning code from before)
-        // Note: For a real business, you'd send the win back to Python here.
-    }
-</script>
+    </script>
+</body>
+</html>
